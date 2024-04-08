@@ -30,8 +30,6 @@ export class AuthService {
     return this.http.post<TokenResponse>(API_URL_AUTH + "login", userLogin)
       .pipe(
         tap((resp: TokenResponse) => {
-          const currentTimestamp = Math.floor(Date.now() / 1000);
-          resp.data.expires_at = currentTimestamp + resp.data.expires_in;
           this.storageService.saveUser(resp.data);
         }),
         catchError(e => { throw e; })
@@ -50,9 +48,7 @@ export class AuthService {
           return of(true);
         }),
         catchError(e => {
-          this.logout().subscribe({
-            error: err => console.error("Error al desloguear", err)
-          });
+          this.storageService.clearUser();
           console.error(e);
           return of(false);
         })
@@ -73,16 +69,16 @@ export class AuthService {
   }
 
   refreshToken(): Observable<TokenResponse> {
-    return this.http.post<TokenResponse>(API_URL_AUTH + "refresh-token", null) //  , { withCredentials: true }Añade el cookie con el refreshToken
+    return this.http.post<TokenResponse>(API_URL_AUTH + "refresh-token", null)
   }
 
   logout(): Observable<ApiResponse> {
-    const usuario_id = this.storageService.getUser()?.usuario_id
+    const usuario_id = this.storageService.getUser()?.usuario_id;
     if(usuario_id){
       return this.http.post<ApiResponse>(API_URL_AUTH + "logout", {usuario_id})
       .pipe(
         tap(() => {
-            this.storageService.clean();
+            this.storageService.clearUser();
             this.router.navigate(['/auth/login']);
         }),
         catchError(e => { throw e; })

@@ -7,7 +7,8 @@ interface StorageUser {
   accessToken: string,
   expires_in: number,
   expires_at?: number,
-  usuario_id: number
+  usuario_id: number,
+  usuario_rol: string
 }
 
 @Injectable({
@@ -22,6 +23,8 @@ export class SessionStorageService {
 
   public saveUser(user: StorageUser): void {
     window.sessionStorage.removeItem(USER_KEY);
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    user.expires_at = currentTimestamp + user.expires_in;
     window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
   }
 
@@ -31,6 +34,10 @@ export class SessionStorageService {
       return JSON.parse(user);
     }
     return null;
+  }
+
+  public clearUser(): void {
+    window.sessionStorage.removeItem(USER_KEY);
   }
 
 }

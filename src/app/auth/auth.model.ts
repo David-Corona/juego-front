@@ -16,7 +16,8 @@ export interface TokenResponse {
     accessToken: string,
     expires_in: number,
     expires_at?: number,
-    usuario_id: number
+    usuario_id: number,
+    usuario_rol: string
   }
 }
 

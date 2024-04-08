@@ -29,7 +29,7 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((e) => {
         // En caso de 401 (excepto si es intento de login o refresh token invalido) => refreshToken()
-        if (e instanceof HttpErrorResponse && e.status === 401 && e.error.error != "invalid-refreshtoken" && !req.url.includes('auth/login')) {
+        if (e instanceof HttpErrorResponse && e.status === 401 && e.error.details != "invalid-refreshtoken" && !req.url.includes('auth/login')) {
           return this.handle401Error(req, next);
         }
         return throwError(() => e);
